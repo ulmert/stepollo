@@ -1520,10 +1520,10 @@ void renderTracks() {
 void handleInput() {
   MidiboyInput::Event event;
   while (Midiboy.readInputEvent(event)) {
-    if (event.m_type == MidiboyInput::EVENT_DOWN) {
+    track_t *track = &g_tracks[g_guiTrackIndex];
+    step_t *step = &g_tracks[g_guiTrackIndex].steps[g_guiStepEditIndex];
 
-      track_t *track = &g_tracks[g_guiTrackIndex];
-      step_t *step = &g_tracks[g_guiTrackIndex].steps[g_guiStepEditIndex];
+    if (event.m_type == MidiboyInput::EVENT_DOWN) {
 
       bool increase = true;
       
@@ -1666,7 +1666,10 @@ void handleInput() {
             } else {
               g_keyModifier ^= KEYMODIFIER_EDIT;
               if (g_keyModifier & KEYMODIFIER_EDIT) {
-                 g_MIDIinNote &= 0x7F;
+                if (g_editState == EDITSTATE_SEQUENCER && STEP_GET_MUTE) {
+                  STEP_TOGGLE_MUTE;
+                }
+                g_MIDIinNote &= 0x7F;
               }
             }
           }
